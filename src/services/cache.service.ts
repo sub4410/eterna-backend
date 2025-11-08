@@ -11,41 +11,67 @@ export class CacheManager {
     this.enabled = process.env.CACHE_ENABLED !== 'false';
 
     if (this.enabled) {
-      // Support both REDIS_URL (Upstash/Railway) and separate host/port/password
-      const redisUrl = process.env.REDIS_URL;
+      // Support both REDIS_URL (Railway/Upstash) and separate host/port/password
+      const redisUrl = process.env.REDIS_URL?.trim();
       
-      this.client = redisUrl 
-        ? new Redis(redisUrl, {
-            retryStrategy: (times) => {
-              const delay = Math.min(times * 50, 2000);
-              return delay;
-            },
-            lazyConnect: true,
-            // Enable TLS for Upstash (rediss://) without rejecting unauthorized certs
-            tls: redisUrl.startsWith('rediss://') ? {} : undefined,
-            family: 4, // Force IPv4
-          })
-        : new Redis({
-            host: process.env.REDIS_HOST || 'localhost',
-            port: parseInt(process.env.REDIS_PORT || '6379'),
-            password: process.env.REDIS_PASSWORD || undefined,
-            retryStrategy: (times) => {
-              const delay = Math.min(times * 50, 2000);
-              return delay;
-            },
-            lazyConnect: true,
-            family: 4, // Force IPv4
-          });
+      logger.info('Initializing Redis connection', {
+        hasRedisUrl: !!redisUrl,
+        redisHost: process.env.REDIS_HOST,
+        environment: process.env.NODE_ENV,
+      });
+
+      if (redisUrl) {
+        // Railway/Upstash provides REDIS_URL
+        this.client = new Redis(redisUrl, {
+          retryStrategy: (times) => {
+            if (times > 10) return null; // Stop retrying after 10 attempts
+            const delay = Math.min(times * 50, 2000);
+            return delay;
+          },
+          lazyConnect: true,
+          // Enable TLS for rediss:// URLs
+          tls: redisUrl.startsWith('rediss://') ? {} : undefined,
+          family: 4, // Force IPv4
+          maxRetriesPerRequest: 3,
+        });
+      } else {
+        // Fallback to separate credentials
+        this.client = new Redis({
+          host: process.env.REDIS_HOST || 'localhost',
+          port: parseInt(process.env.REDIS_PORT || '6379'),
+          password: process.env.REDIS_PASSWORD || undefined,
+          retryStrategy: (times) => {
+            if (times > 10) return null;
+            const delay = Math.min(times * 50, 2000);
+            return delay;
+          },
+          lazyConnect: true,
+          family: 4,
+          maxRetriesPerRequest: 3,
+        });
+      }
 
       this.client.on('error', (err) => {
         logger.error('Redis connection error', { error: err.message });
       });
 
       this.client.on('connect', () => {
-        logger.info('Redis connected successfully');
+        logger.info('✅ Redis connected successfully');
+      });
+
+      this.client.on('ready', () => {
+        logger.info('✅ Redis is ready to accept commands');
+      });
+
+      this.client.on('close', () => {
+        logger.warn('Redis connection closed');
+      });
+
+      this.client.on('reconnecting', () => {
+        logger.info('Reconnecting to Redis...');
       });
     } else {
-      logger.warn('Cache is disabled');
+      logger.warn('⚠️  Cache is disabled (CACHE_ENABLED=false)');
     }
   }
 
