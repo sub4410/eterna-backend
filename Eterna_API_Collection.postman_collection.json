@@ -1,0 +1,263 @@
+{
+  "info": {
+    "name": "Eterna Backend API",
+    "description": "Real-time Data Aggregation Service for Meme Coins",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "12345678"
+  },
+  "item": [
+    {
+      "name": "Health Check",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/health",
+          "host": ["{{base_url}}"],
+          "path": ["api", "health"]
+        },
+        "description": "Check if the API is running and healthy"
+      }
+    },
+    {
+      "name": "Get All Tokens",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/tokens?limit=20",
+          "host": ["{{base_url}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "20",
+              "description": "Number of results per page"
+            }
+          ]
+        },
+        "description": "Fetch all tokens with default pagination"
+      }
+    },
+    {
+      "name": "Get Tokens - Sorted by Volume",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/tokens?sortBy=volume&sortOrder=desc&limit=10",
+          "host": ["{{base_url}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {
+              "key": "sortBy",
+              "value": "volume",
+              "description": "Sort by volume"
+            },
+            {
+              "key": "sortOrder",
+              "value": "desc",
+              "description": "Descending order"
+            },
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        },
+        "description": "Get top 10 tokens sorted by volume"
+      }
+    },
+    {
+      "name": "Get Tokens - Sorted by Price Change",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/tokens?sortBy=price_change&sortOrder=desc&limit=10",
+          "host": ["{{base_url}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {
+              "key": "sortBy",
+              "value": "price_change"
+            },
+            {
+              "key": "sortOrder",
+              "value": "desc"
+            },
+            {
+              "key": "limit",
+              "value": "10"
+            }
+          ]
+        },
+        "description": "Get top gainers by price change"
+      }
+    },
+    {
+      "name": "Get Tokens - With Volume Filter",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/tokens?minVolume=100&sortBy=volume&sortOrder=desc",
+          "host": ["{{base_url}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {
+              "key": "minVolume",
+              "value": "100",
+              "description": "Minimum volume in SOL"
+            },
+            {
+              "key": "sortBy",
+              "value": "volume"
+            },
+            {
+              "key": "sortOrder",
+              "value": "desc"
+            }
+          ]
+        },
+        "description": "Get tokens with minimum volume of 100 SOL"
+      }
+    },
+    {
+      "name": "Get Tokens - With Liquidity Filter",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/tokens?minLiquidity=50&sortBy=liquidity&sortOrder=desc",
+          "host": ["{{base_url}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {
+              "key": "minLiquidity",
+              "value": "50",
+              "description": "Minimum liquidity in SOL"
+            },
+            {
+              "key": "sortBy",
+              "value": "liquidity"
+            },
+            {
+              "key": "sortOrder",
+              "value": "desc"
+            }
+          ]
+        },
+        "description": "Get tokens with minimum liquidity of 50 SOL"
+      }
+    },
+    {
+      "name": "Get Tokens - Paginated (Page 2)",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/tokens?limit=10&cursor=10",
+          "host": ["{{base_url}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "10"
+            },
+            {
+              "key": "cursor",
+              "value": "10",
+              "description": "Cursor from previous response"
+            }
+          ]
+        },
+        "description": "Get second page of results using cursor-based pagination"
+      }
+    },
+    {
+      "name": "Get Tokens - By Market Cap",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/tokens?sortBy=market_cap&sortOrder=desc&limit=20",
+          "host": ["{{base_url}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {
+              "key": "sortBy",
+              "value": "market_cap"
+            },
+            {
+              "key": "sortOrder",
+              "value": "desc"
+            },
+            {
+              "key": "limit",
+              "value": "20"
+            }
+          ]
+        },
+        "description": "Get tokens sorted by market cap"
+      }
+    },
+    {
+      "name": "Get Token by Address",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/tokens/{{token_address}}",
+          "host": ["{{base_url}}"],
+          "path": ["api", "tokens", "{{token_address}}"]
+        },
+        "description": "Get specific token by its address"
+      }
+    },
+    {
+      "name": "Refresh Token Data",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/tokens/refresh",
+          "host": ["{{base_url}}"],
+          "path": ["api", "tokens", "refresh"]
+        },
+        "description": "Force refresh of all token data from DEX sources"
+      }
+    },
+    {
+      "name": "Load Test - Rapid Requests",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": {
+          "raw": "{{base_url}}/api/tokens?limit=20",
+          "host": ["{{base_url}}"],
+          "path": ["api", "tokens"],
+          "query": [
+            {
+              "key": "limit",
+              "value": "20"
+            }
+          ]
+        },
+        "description": "Use Runner to execute this 10 times rapidly to test caching and performance"
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "token_address",
+      "value": "576P1t7XsRL4ZVj38LV2eYWxXRPguBADA8BxcNz1xo8y",
+      "type": "string"
+    }
+  ]
+}
